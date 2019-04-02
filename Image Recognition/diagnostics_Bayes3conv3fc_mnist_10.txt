@@ -1,0 +1,1 @@
+{'Epoch': 1, 'Loss': 2.861867904663086, 'Accuracy': tensor(10)}

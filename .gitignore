@@ -1,3 +1,6 @@
 checkpoint/
 data/
 checkpoint_/
+*.pyc
+*/*.pyc
+*/*/*.pyc

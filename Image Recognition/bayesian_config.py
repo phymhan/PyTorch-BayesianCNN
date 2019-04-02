@@ -3,11 +3,11 @@ import math
 
 start_epoch = 1
 num_epochs = 100
-batch_size = 256
+batch_size = 8
 optim_type = 'Adam'
 lr = 0.001
 weight_decay = 0.0005
-num_samples = 25
+num_samples = 10
 beta_type = "Blundell"
 
 

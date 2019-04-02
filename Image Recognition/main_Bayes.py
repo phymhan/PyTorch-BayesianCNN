@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 # Hyper Parameter settings
 use_cuda = torch.cuda.is_available()
-torch.cuda.set_device(0)
+#torch.cuda.set_device(1)
 best_acc = 0
 resize=32
 
@@ -76,20 +76,21 @@ transform_test = transforms.Compose([
 
 
 print("| Preparing {} dataset...".format(args.dataset))
-dataset_prep = 'torchvision.datasets.{}'.format(args.dataset)
+dataset_prep = eval('torchvision.datasets.{}'.format(args.dataset.upper()))
+# dataset_prep = torchvision.datasets.MNIST
 trainset = dataset_prep(root='./data', train=True, download=True, transform=transform_train)
 testset = dataset_prep(root='./data', train=False, download=False, transform=transform_test)
 
 
-if (dataset_name == 'CIFAR10'):
+if (args.dataset.upper() == 'CIFAR10'):
     outputs = 10
     inputs = 3
 
-elif (dataset_name == 'CIFAR100'):
+elif (args.dataset.upper() == 'CIFAR100'):
     outputs = 100
     inputs = 3
 
-elif (dataset_name == 'MNIST'):
+elif (args.dataset.upper() == 'MNIST'):
     outputs = 10
     inputs = 1
 
@@ -174,7 +175,7 @@ def train(epoch):
         loss.backward()  # Backward Propagation
         optimizer.step() # Optimizer update
 
-        train_loss += loss.data[0]
+        train_loss += loss.item()
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(y.data).cpu().sum()
@@ -182,10 +183,10 @@ def train(epoch):
         sys.stdout.write('\r')
         sys.stdout.write('| Epoch [%3d/%3d] Iter[%3d/%3d]\t\tLoss: %.4f Acc@1: %.3f%%'
                 %(epoch, cf.num_epochs, batch_idx+1,
-                    (len(trainset)//cf.batch_size)+1, loss.data[0], (100*correct/total)/cf.num_samples))
+                    (len(trainset)//cf.batch_size)+1, loss.item(), (100*correct/total)/cf.num_samples))
         sys.stdout.flush()
 
-    diagnostics_to_write =  {'Epoch': epoch, 'Loss': loss.data[0], 'Accuracy': (100*correct/total)/cf.num_samples}
+    diagnostics_to_write =  {'Epoch': epoch, 'Loss': loss.item(), 'Accuracy': (100*correct/total)/cf.num_samples}
     with open(logfile, 'a') as lf:
         lf.write(str(diagnostics_to_write))
 
@@ -217,7 +218,7 @@ def test(epoch):
 
         loss = vi(outputs,y,kl,beta)
 
-        test_loss += loss.data[0]
+        test_loss += loss.item()
         _, predicted = torch.max(outputs.data, 1)
         preds = F.softmax(outputs, dim=1)
         #print(preds)
@@ -226,7 +227,7 @@ def test(epoch):
         conf.append(results[0][0].item())
         total += targets.size(0)
         correct += preds
-        dicted.eq(y.data).cpu().sum()
+        #dicted.eq(y.data).cpu().sum()
 
     # Save checkpoint when best model
     #print (conf)
